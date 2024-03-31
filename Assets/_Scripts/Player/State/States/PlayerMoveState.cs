@@ -14,16 +14,18 @@ public class PlayerMoveState : PlayerGroundedState
         base.Enter();
     }
 
-    public override void Exit()
-    {
-        base.Exit();
-    }
-
     public override void Update()
     {
         base.Update();
         Move();
     }
+
+    public override void Exit()
+    {
+        base.Exit();
+    }
+
+
 
     private void Move()
     {

@@ -17,15 +17,14 @@ public class PlayerInputManager : MonoBehaviour
     public static Action jumpPerformed;
     public static Action actionPerformed;
     public static Action dashPerformed;
+    public static Action movePerformed;
 
     private void Awake()
     {
-
         if (Instance == null)
             Instance = this;
         else
             Destroy(gameObject);
-
     }
 
     private void OnEnable()
@@ -68,10 +67,10 @@ public class PlayerInputManager : MonoBehaviour
     }
 
 
-
     private void OnMovePerformed(InputAction.CallbackContext context)
     {
         moveVector = context.ReadValue<Vector2>();
+        movePerformed?.Invoke();
     }
 
     private void OnMoveCanceled(InputAction.CallbackContext context)

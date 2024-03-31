@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,8 +14,9 @@ public class Player : MonoBehaviour
     [Header(" Dash ")]
     [SerializeField] public float dashSpeed;
     [SerializeField] public float dashDuration;
-    public int dashDirection = 1;
     [SerializeField] public float dashCooldown;
+    [HideInInspector] public int dashDirection = 1;
+    public bool canDash;
 
     [Header(" Ground Collision ")]
     [SerializeField] private LayerMask whatIsGround;
@@ -54,14 +56,15 @@ public class Player : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody2D>();
         stateMachine.Initialize(idleState);
+        canDash = true;
     }
 
 
 
     private void Update()
     {
-        HandleDirection();
         stateMachine.currentState.Update();
+        Debug.Log("Current State : " + stateMachine.currentState);
 
     }
 
@@ -70,14 +73,14 @@ public class Player : MonoBehaviour
         rb.velocity = new Vector2(vX, vY);
     }
 
-    public bool isGrounded() => Physics2D.BoxCast(transform.position, groundCheckBoxSize, 0, -transform.up, groundCastDistance, whatIsGround);
-    public bool isWallDetected() => Physics2D.Raycast(transform.position, Vector2.right,wallCastDistance, whatIsWall);
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawWireCube(transform.position - transform.up * groundCastDistance, groundCheckBoxSize);
-        Gizmos.DrawLine(transform.position, new Vector3(transform.position.x + wallCastDistance,transform.position.y));
 
+    #region OnInputEvents
+    // On Move Performed
+    private void OnMovePerformed()
+    {
+        HandleDirection();
     }
+
     private void HandleDirection()
     {
         facingDirection = (int)PlayerInputManager.Instance.moveVector.x;
@@ -87,10 +90,25 @@ public class Player : MonoBehaviour
 
     private void Flip()
     {
-        transform.localScale= new Vector3(1 * facingDirection, 1, 1);
+        transform.localScale = new Vector3(1 * facingDirection, 1, 1);
         dashDirection = facingDirection == 0 ? 1 : facingDirection;
     }
 
+    // On Dash Performed
+    private void OnDashPerformed()
+    {
+        if (canDash)
+            StartCoroutine(DashCooldownRoutine(dashCooldown));
+    }
+
+    IEnumerator DashCooldownRoutine(float time)
+    {
+        yield return new WaitForSeconds(time);
+        canDash = true;
+    }
+    #endregion
+
+    #region Initalization
     private void SetStates()
     {
         stateMachine = new PlayerStateMachine();
@@ -101,4 +119,33 @@ public class Player : MonoBehaviour
         dashState = new PlayerDashState(this, stateMachine, "Dash");
     }
 
+    private void OnEnable()
+    {
+        PlayerInputManager.movePerformed += OnMovePerformed;
+        PlayerInputManager.dashPerformed += OnDashPerformed;
+    }
+
+
+
+    private void OnDisable()
+    {
+        PlayerInputManager.movePerformed -= OnMovePerformed;
+        PlayerInputManager.dashPerformed -= OnDashPerformed;
+
+    }
+
+    #endregion
+
+    #region Checks & Gizmos
+    public bool isGrounded() => Physics2D.BoxCast(transform.position, groundCheckBoxSize, 0, -transform.up, groundCastDistance, whatIsGround); // GroundCheck
+    public bool isWallDetected() => Physics2D.Raycast(transform.position, Vector2.right, wallCastDistance, whatIsWall); // WallCheck
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireCube(transform.position - transform.up * groundCastDistance, groundCheckBoxSize); // GroundCheck
+        Gizmos.DrawLine(transform.position, new Vector3(transform.position.x + wallCastDistance * dashDirection, transform.position.y)); // WallCheck
+
+    }
+
+    #endregion
 }

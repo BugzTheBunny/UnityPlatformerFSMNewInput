@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerGroundedState : PlayerState
@@ -19,7 +20,7 @@ public class PlayerGroundedState : PlayerState
     public override void Update()
     {
         base.Update();
-        CheciIfIsFalling();
+        CheckiIfIsFalling();
 
     }
 
@@ -38,6 +39,7 @@ public class PlayerGroundedState : PlayerState
     private void Unsubscribe()
     {
         PlayerInputManager.jumpPerformed -= OnJump;
+
     }
 
     private void OnJump()
@@ -46,11 +48,10 @@ public class PlayerGroundedState : PlayerState
             stateMachine.ChangeState(player.jumpState);
     }
 
-    private void CheciIfIsFalling()
+
+    private void CheckiIfIsFalling()
     {
         if (rb.velocity.y < 0)
-        {
             stateMachine.ChangeState(player.airState);
-        }
     }
 }

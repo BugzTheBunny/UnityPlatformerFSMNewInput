@@ -12,14 +12,15 @@ public class PlayerDashState : PlayerState
     public override void Enter()
     {
         base.Enter();
-        stateTimer = player.dashDuration;
+        stateDuration = player.dashDuration;
+        player.canDash = false;
     }
 
     public override void Update()
     {
         base.Update();
-        player.SetVelocity(player.dashSpeed * player.facingDirection, 0);
-        if (stateTimer < 0)
+        player.SetVelocity(player.dashSpeed * player.dashDirection, 0);
+        if (stateDuration < 0)
             stateMachine.ChangeState(player.idleState);
     }
 
@@ -27,6 +28,6 @@ public class PlayerDashState : PlayerState
     {
         base.Exit();
         player.SetVelocity(0, rb.velocity.y);
-    }
+    }   
 
 }
