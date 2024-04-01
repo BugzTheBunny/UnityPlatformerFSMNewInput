@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Windows;
@@ -7,13 +8,15 @@ using UnityEngine.Windows;
 public class Player : MonoBehaviour
 {
     [Header(" Movement ")]
-    [SerializeField] private float _moveSpeed = 8f; public float moveSpeed { get => _moveSpeed; private set => _moveSpeed = value; }
-    [SerializeField] private float _jumpForce = 15; public float jumpForce { get => _jumpForce; private set => _jumpForce = value; }
-    [SerializeField] private float _wallJumpForce = 5f; public float wallJumpForce { get => _wallJumpForce; private set => _wallJumpForce = value;  }
+    [SerializeField] private float _moveSpeed = 8f; public float moveSpeed { get => _moveSpeed; }
+    [SerializeField] private float _jumpForce = 15; public float jumpForce { get => _jumpForce; }
+    [SerializeField] private float _wallJumpForce = 5f; public float wallJumpForce { get => _wallJumpForce; }
     [Range(0,1)]
-    [SerializeField] public float _wallSlideSpeed = 0.5f; public float wallSlideSpeed { get => _wallSlideSpeed; private set => _wallSlideSpeed = value; }
+    [SerializeField] public float _wallSlideSpeed = 0.5f; public float wallSlideSpeed { get => _wallSlideSpeed; }
+    [SerializeField] public bool _canWallSlide; public bool canWallSlide { get => _canWallSlide; }
     public int facingDirection { get; private set; }
-    public bool canMove { get; private set; }
+    [SerializeField] private bool _canMove; public bool canMove{ get => _canMove; }
+    
 
     [Header(" Dash ")]
     [SerializeField] private float _dashSpeed; public float dashSpeed { get => _dashSpeed; private set => _dashSpeed = value; }
@@ -63,7 +66,7 @@ public class Player : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         stateMachine.Initialize(idleState);
         EnableMovement();
-        canDash = true;
+        EnableDash();
         facingDirection = 1;
     }
 
@@ -78,17 +81,10 @@ public class Player : MonoBehaviour
     {
         rb.velocity = new Vector2(vX, vY);
     }
-
-    public void DisableMovement()
-    {
-        canMove = false;
-    }
-
-    public void EnableMovement()
-    {
-        canMove = true;
-    }
-
+    public void EnableMovement() => _canMove = true;
+    public void DisableMovement() => _canMove = false;
+    public void EnableDash() => canDash = true;
+    public void DisableDash() => canDash = false;
 
     #region OnInputEvents
     // On Move Performed
@@ -136,6 +132,7 @@ public class Player : MonoBehaviour
         canDash = true;
     }
     #endregion
+
     #region Initalization
     private void SetStates()
     {
@@ -165,6 +162,7 @@ public class Player : MonoBehaviour
     }
 
     #endregion
+
     #region Checks & Gizmos
     public bool isGrounded() => Physics2D.BoxCast(transform.position, groundCheckBoxSize, 0, -transform.up, groundCastDistance, whatIsGround); // GroundCheck
     public bool isWallDetected() => Physics2D.Raycast(transform.position, Vector2.right * facingDirection, wallCastDistance, whatIsWall); // WallCheck

@@ -26,8 +26,7 @@ public class PlayerState
     public virtual void Enter()
     {
         PlayerInputManager.Instance.actions.Player.Dash.performed += OnDashPerformed;
-        if (_animBoolName != "")
-            player.animator.SetBool(_animBoolName, true);
+        player.animator.SetBool(_animBoolName, true);
         rb = player.rb;
     }
 
@@ -35,12 +34,12 @@ public class PlayerState
     {
         stateDuration -= Time.deltaTime;
         SetAxis();
-        OnWallSlide();
+        if (player.canWallSlide)
+            OnWallSlide();
     }
     public virtual void Exit()
     {
-        if (_animBoolName != "")
-            player.animator.SetBool(_animBoolName, false); // Ends animation on change.
+        player.animator.SetBool(_animBoolName, false); // Ends animation on change.
         PlayerInputManager.Instance.actions.Player.Dash.performed -= OnDashPerformed;
 
     }

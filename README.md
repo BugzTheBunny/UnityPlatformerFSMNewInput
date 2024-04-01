@@ -17,8 +17,8 @@ This repo contains an example of a Finite state machine, using the new Input Sys
 4. Fall State
 5. Dash State
 6. Wall Slide State
+7. Wall Jump State
 
 ## Todo:
-1. Wall Jump State
-2. Attack State
-3. Edge Climb State
+1. Attack State
+2. Edge Climb State
