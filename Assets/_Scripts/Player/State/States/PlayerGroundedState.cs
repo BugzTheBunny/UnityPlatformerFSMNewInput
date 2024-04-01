@@ -45,12 +45,12 @@ public class PlayerGroundedState : PlayerState
     private void OnJump()
     {
         if (player.isGrounded())
+            player.Flip();
             stateMachine.ChangeState(player.jumpState);
     }
 
-
     private void CheckiIfIsFalling()
-    {
+    { 
         if (rb.velocity.y < 0)
             stateMachine.ChangeState(player.airState);
     }

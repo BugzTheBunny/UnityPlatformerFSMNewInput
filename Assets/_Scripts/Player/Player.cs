@@ -2,20 +2,24 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Windows;
 
 public class Player : MonoBehaviour
 {
     [Header(" Movement ")]
-    [SerializeField] public float moveSpeed = 8f;
-    [SerializeField] public float jumpForce = 15;
+    [SerializeField] private float _moveSpeed = 8f; public float moveSpeed { get => _moveSpeed; private set => _moveSpeed = value; }
+    [SerializeField] private float _jumpForce = 15; public float jumpForce { get => _jumpForce; private set => _jumpForce = value; }
+    [SerializeField] private float _wallJumpForce = 5f; public float wallJumpForce { get => _wallJumpForce; private set => _wallJumpForce = value;  }
+    [Range(0,1)]
+    [SerializeField] public float _wallSlideSpeed = 0.5f; public float wallSlideSpeed { get => _wallSlideSpeed; private set => _wallSlideSpeed = value; }
     public int facingDirection { get; private set; }
-
+    public bool canMove { get; private set; }
 
     [Header(" Dash ")]
-    [SerializeField] public float dashSpeed;
-    [SerializeField] public float dashDuration;
-    [SerializeField] public float dashCooldown;
-    [HideInInspector] public int dashDirection = 1;
+    [SerializeField] private float _dashSpeed; public float dashSpeed { get => _dashSpeed; private set => _dashSpeed = value; }
+    [SerializeField] private float _dashDuration; public float dashDuration{ get => _dashDuration; private set => _dashDuration = value; }
+    [SerializeField] private float _dashCooldown; public float dashCooldown{ get => _dashCooldown; private set => _dashCooldown = value; }
+    [HideInInspector] private int _dashDirection = 1; public int dashDirection { get => _dashDirection; private set => _dashDirection = value; }
     public bool canDash;
 
     [Header(" Ground Collision ")]
@@ -28,19 +32,21 @@ public class Player : MonoBehaviour
     [SerializeField] private LayerMask whatIsWall;
     [SerializeField] private float wallCastDistance;
 
+
     #region [--- Components ---]
     public Animator animator { get; private set; }
     public Rigidbody2D rb { get; private set; }
+    public PlayerStateMachine stateMachine { get; private set; }
 
     #endregion
 
-
     #region [--- States ---]
-    public PlayerStateMachine stateMachine { get; private set; }
     public PlayerIdleState idleState { get; private set; }
     public PlayerMoveState moveState { get; private set; }
     public PlayerJumpState jumpState { get; private set; }
     public PlayerAirState airState { get; private set; }
+    public PlayerWallJumpState  wallJumpState { get; private set; }
+    public PlayerWallSlideState wallSlideState { get; private set; }
     public PlayerDashState dashState { get; private set; }
 
     #endregion
@@ -56,7 +62,9 @@ public class Player : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody2D>();
         stateMachine.Initialize(idleState);
+        EnableMovement();
         canDash = true;
+        facingDirection = 1;
     }
 
 
@@ -64,8 +72,6 @@ public class Player : MonoBehaviour
     private void Update()
     {
         stateMachine.currentState.Update();
-        Debug.Log("Current State : " + stateMachine.currentState);
-
     }
 
     public void SetVelocity(float vX, float vY)
@@ -73,25 +79,48 @@ public class Player : MonoBehaviour
         rb.velocity = new Vector2(vX, vY);
     }
 
+    public void DisableMovement()
+    {
+        canMove = false;
+    }
+
+    public void EnableMovement()
+    {
+        canMove = true;
+    }
+
 
     #region OnInputEvents
     // On Move Performed
     private void OnMovePerformed()
     {
-        HandleDirection();
+        if (canMove)
+            HandleDirection();
     }
 
     private void HandleDirection()
     {
-        facingDirection = (int)PlayerInputManager.Instance.moveVector.x;
-        if (facingDirection != 0)
-            Flip();
+        SetFacingDirection();
+        Flip();
     }
 
-    private void Flip()
+    public void Flip()
     {
         transform.localScale = new Vector3(1 * facingDirection, 1, 1);
         dashDirection = facingDirection == 0 ? 1 : facingDirection;
+    }
+
+    private void SetFacingDirection()
+    {
+        int xInput = (int)PlayerInputManager.Instance.moveVector.x;
+        if (xInput != 0)
+            facingDirection = xInput;
+    }
+
+    public void SetFacingDirection(int direction)
+    {
+        if (direction != 0)
+            facingDirection = direction;
     }
 
     // On Dash Performed
@@ -107,7 +136,6 @@ public class Player : MonoBehaviour
         canDash = true;
     }
     #endregion
-
     #region Initalization
     private void SetStates()
     {
@@ -116,9 +144,11 @@ public class Player : MonoBehaviour
         moveState = new PlayerMoveState(this, stateMachine, "Move");
         jumpState = new PlayerJumpState(this, stateMachine, "Jump");
         airState = new PlayerAirState(this, stateMachine, "Jump");
+        wallSlideState = new PlayerWallSlideState(this, stateMachine, "WallSlide");
+        wallJumpState = new PlayerWallJumpState(this, stateMachine, "WallJump");
         dashState = new PlayerDashState(this, stateMachine, "Dash");
     }
-
+    
     private void OnEnable()
     {
         PlayerInputManager.movePerformed += OnMovePerformed;
@@ -135,15 +165,14 @@ public class Player : MonoBehaviour
     }
 
     #endregion
-
     #region Checks & Gizmos
     public bool isGrounded() => Physics2D.BoxCast(transform.position, groundCheckBoxSize, 0, -transform.up, groundCastDistance, whatIsGround); // GroundCheck
-    public bool isWallDetected() => Physics2D.Raycast(transform.position, Vector2.right, wallCastDistance, whatIsWall); // WallCheck
+    public bool isWallDetected() => Physics2D.Raycast(transform.position, Vector2.right * facingDirection, wallCastDistance, whatIsWall); // WallCheck
 
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireCube(transform.position - transform.up * groundCastDistance, groundCheckBoxSize); // GroundCheck
-        Gizmos.DrawLine(transform.position, new Vector3(transform.position.x + wallCastDistance * dashDirection, transform.position.y)); // WallCheck
+        Gizmos.DrawLine(transform.position, new Vector3(transform.position.x + wallCastDistance * facingDirection, transform.position.y)); // WallCheck
 
     }
 

@@ -29,8 +29,9 @@ public class PlayerMoveState : PlayerGroundedState
 
     private void Move()
     {
-        player.SetVelocity(xInput * player.moveSpeed, rb.velocity.y);
-        if (xInput == 0)
-            stateMachine.ChangeState(player.idleState);
+        if (player.canMove)
+            player.SetVelocity(xInput * player.moveSpeed, rb.velocity.y);
+            if (xInput == 0)
+                stateMachine.ChangeState(player.idleState);
     }
 }

@@ -28,6 +28,9 @@ public class PlayerAirState : PlayerState
 
     private void Move()
     {
-        player.SetVelocity(xInput * player.moveSpeed, rb.velocity.y);
+        if (player.canMove)
+        {
+            player.SetVelocity(xInput * player.moveSpeed, rb.velocity.y);
+        }
     }
 }
