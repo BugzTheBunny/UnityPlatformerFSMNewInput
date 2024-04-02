@@ -21,4 +21,5 @@ This repo contains an example of a Finite state machine, using the new Input Sys
 
 ## Todo:
 1. Attack State
-2. Edge Climb State
+2. Air Attack State
+3. Edge Climb State

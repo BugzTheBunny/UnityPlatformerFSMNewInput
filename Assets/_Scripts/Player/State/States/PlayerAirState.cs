@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerAirState : PlayerState
 {
-    public PlayerAirState(Player _player, PlayerStateMachine _stateMachine, string animBoolName) : base(_player, _stateMachine, animBoolName)
+    public PlayerAirState(Player player, PlayerStateMachine stateMachine, string animBoolName) : base(player, stateMachine, animBoolName)
     {
     }
 
@@ -24,6 +24,17 @@ public class PlayerAirState : PlayerState
     public override void Exit()
     {
         base.Exit();
+
+    }
+
+    protected override void Subscribe()
+    {
+        PlayerInputManager.dashPerformed += OnDashPerformed;
+    }
+
+    protected override void Unsubscribe()
+    {
+        PlayerInputManager.dashPerformed -= OnDashPerformed;
     }
 
     private void Move()

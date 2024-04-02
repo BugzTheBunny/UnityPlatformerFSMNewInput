@@ -7,17 +7,20 @@ using UnityEngine.InputSystem;
 public class PlayerInputManager : MonoBehaviour
 {
     public static PlayerInputManager Instance;
-
     public Vector2 moveVector { get; private set; }
 
-    public PlayerActionAsset actions { get; private set; }
+
+    [Header(" Components ")]
+    private PlayerActionAsset actions;
 
 
     [Header(" Actions ")]
     public static Action jumpPerformed;
-    public static Action actionPerformed;
+    public static Action attackPerformed;
     public static Action dashPerformed;
     public static Action movePerformed;
+    public static Action moveCanceled;
+
 
     private void Awake()
     {
@@ -29,12 +32,12 @@ public class PlayerInputManager : MonoBehaviour
 
     private void OnEnable()
     {
-        SetupInputsOnEnable();
+        Subscribe();
     }
 
     private void OnDisable()
     {
-        SetupInputsOnDisable();
+        Unsibscribe();
     }
 
     void Start()
@@ -42,26 +45,26 @@ public class PlayerInputManager : MonoBehaviour
         actions = new PlayerActionAsset();
     }
 
-    private void SetupInputsOnEnable()
+    private void Subscribe()
     {
         actions = new PlayerActionAsset();
         actions.Enable();
         actions.Player.Move.performed += OnMovePerformed;
         actions.Player.Move.canceled += OnMoveCanceled;
         actions.Player.Jump.performed += OnJumpPerformed;
-        actions.Player.Action.performed += OnActionPerformed;
+        actions.Player.Attack.performed += OnAttackPerformed;
         actions.Player.Dash.performed += OnDashPerformed;
 
     }
 
 
 
-    private void SetupInputsOnDisable()
+    private void Unsibscribe()
     {
         actions.Player.Move.performed -= OnMovePerformed;
         actions.Player.Move.canceled -= OnMoveCanceled;
         actions.Player.Jump.performed -= OnJumpPerformed;
-        actions.Player.Action.performed -= OnActionPerformed;
+        actions.Player.Attack.performed -= OnAttackPerformed;
         actions.Player.Dash.performed -= OnDashPerformed;
         actions.Disable();
     }
@@ -76,11 +79,12 @@ public class PlayerInputManager : MonoBehaviour
     private void OnMoveCanceled(InputAction.CallbackContext context)
     {
         moveVector = Vector2.zero;
+        moveCanceled?.Invoke();
     }
 
-    private void OnActionPerformed(InputAction.CallbackContext context)
+    private void OnAttackPerformed(InputAction.CallbackContext context)
     {
-        actionPerformed?.Invoke();
+        attackPerformed?.Invoke();
     }
 
     private void OnJumpPerformed(InputAction.CallbackContext context)

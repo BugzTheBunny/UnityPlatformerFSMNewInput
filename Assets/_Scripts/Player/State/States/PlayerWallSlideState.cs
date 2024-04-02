@@ -5,17 +5,13 @@ using UnityEngine;
 
 public class PlayerWallSlideState : PlayerState
 {
-    public PlayerWallSlideState(Player _player, PlayerStateMachine _stateMachine, string animBoolName) : base(_player, _stateMachine, animBoolName)
+    public PlayerWallSlideState(Player player, PlayerStateMachine stateMachine, string animBoolName) : base(player, stateMachine, animBoolName)
     {
     }
-
-    int _wallDirection;
 
     public override void Enter()
     {
         base.Enter();
-        PlayerInputManager.jumpPerformed += OnJump;
-        _wallDirection = player.facingDirection;
 
     }
 
@@ -32,9 +28,10 @@ public class PlayerWallSlideState : PlayerState
     public override void Exit()
     {
         base.Exit();
-        PlayerInputManager.jumpPerformed -= OnJump;
 
     }
+
+    
 
     private void OnJump()
     {
@@ -62,5 +59,15 @@ public class PlayerWallSlideState : PlayerState
         }
     }
 
-    
+    protected override void Subscribe()
+    {
+        base.Subscribe();
+        PlayerInputManager.jumpPerformed += OnJump;
+    }
+
+    protected override void Unsubscribe()
+    {
+        base.Unsubscribe();
+        PlayerInputManager.jumpPerformed -= OnJump;
+    }
 }
