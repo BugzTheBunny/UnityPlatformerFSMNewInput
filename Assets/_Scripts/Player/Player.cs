@@ -52,8 +52,6 @@ public class Player : MonoBehaviour
     public PlayerWallSlideState wallSlideState { get; private set; }
     public PlayerDashState dashState { get; private set; }
 
-    public PlayerPrimaryAttackState primaryAttackState { get; private set; }
-
     #endregion
 
 
@@ -146,8 +144,6 @@ public class Player : MonoBehaviour
         wallSlideState = new PlayerWallSlideState(this, stateMachine, "WallSlide");
         wallJumpState = new PlayerWallJumpState(this, stateMachine, "WallJump");
         dashState = new PlayerDashState(this, stateMachine, "Dash");
-        primaryAttackState = new PlayerPrimaryAttackState(this, stateMachine, "Attack");
-
     }
     
     private void OnEnable()
@@ -162,6 +158,7 @@ public class Player : MonoBehaviour
     {
         PlayerInputManager.movePerformed -= OnMovePerformed;
         PlayerInputManager.dashPerformed -= OnDashPerformed;
+
     }
 
     #endregion

@@ -6,13 +6,14 @@ using UnityEngine;
 
 public class PlayerGroundedState : PlayerState
 {
-    public PlayerGroundedState(Player player, PlayerStateMachine stateMachine, string animBoolName) : base(player, stateMachine, animBoolName)
+    public PlayerGroundedState(Player _player, PlayerStateMachine _stateMachine, string animBoolName) : base(_player, _stateMachine, animBoolName)
     {
     }
 
     public override void Enter()
     {
         base.Enter();
+        Subscribe();
     }
 
 
@@ -26,28 +27,30 @@ public class PlayerGroundedState : PlayerState
     public override void Exit()
     {
         base.Exit();
+        Unsubscribe();
+
     }
 
-
-    protected override void Subscribe()
+    private void Subscribe()
     {
         PlayerInputManager.jumpPerformed += OnJump;
-        PlayerInputManager.dashPerformed += OnDashPerformed;
     }
 
-    protected override void Unsubscribe()
+    private void Unsubscribe()
     {
         PlayerInputManager.jumpPerformed -= OnJump;
-        PlayerInputManager.dashPerformed -= OnDashPerformed;
+
     }
 
     private void OnJump()
     {
-        stateMachine.ChangeState(player.jumpState);
+        if (player.isGrounded())
+            player.Flip();
+            stateMachine.ChangeState(player.jumpState);
     }
 
     private void CheckiIfIsFalling()
-    {
+    { 
         if (rb.velocity.y < 0)
             stateMachine.ChangeState(player.airState);
     }

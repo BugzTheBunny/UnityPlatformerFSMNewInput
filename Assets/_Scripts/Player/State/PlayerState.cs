@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerState
@@ -10,10 +12,11 @@ public class PlayerState
     protected Rigidbody2D rb;
     private string _animBoolName;
 
+
     [Header(" Settings ")]
-    protected float stateDuration;
+    protected float stateDuration; // Certein States have "time to be alive", like Dash.
     protected float xInput;
-    
+
     public PlayerState(Player _player, PlayerStateMachine _stateMachine, string animBoolName)
     {
         player = _player;
@@ -22,8 +25,7 @@ public class PlayerState
     }
     public virtual void Enter()
     {
-        Subscribe();
-
+        PlayerInputManager.Instance.actions.Player.Dash.performed += OnDashPerformed;
         player.animator.SetBool(_animBoolName, true);
         rb = player.rb;
     }
@@ -31,65 +33,55 @@ public class PlayerState
     public virtual void Update()
     {
         stateDuration -= Time.deltaTime;
-        SetYVelocityAnimatorParam();
+        SetAxis();
         if (player.canWallSlide)
             OnWallSlide();
     }
-
     public virtual void Exit()
     {
-        player.animator.SetBool(_animBoolName, false);
-
-        Unsubscribe();
-    }
-
-    /// <summary>
-    /// Used to subscribe to events, in this Base subscribe, we sub to movePerformed and moveCanceled to set the xInput for all the states.
-    /// </summary>
-    protected virtual void Subscribe()
-    {
-        PlayerInputManager.movePerformed += OnMove;
-        PlayerInputManager.moveCanceled += OnMoveCanceled;
-    }
-
-
-
-    /// <summary>
-    /// Unsubscribe from the events.
-    /// </summary>
-    protected virtual void Unsubscribe()
-    {
-        PlayerInputManager.movePerformed -= OnMove;
-        PlayerInputManager.moveCanceled -= OnMoveCanceled;
+        player.animator.SetBool(_animBoolName, false); // Ends animation on change.
+        PlayerInputManager.Instance.actions.Player.Dash.performed -= OnDashPerformed;
 
     }
 
-    protected void OnDashPerformed()
+    private void OnDashPerformed(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
         if (player.canDash)
+        {
             stateMachine.ChangeState(player.dashState);
+        }
     }
-
-    protected virtual void OnMove()
-    {
-        xInput = PlayerInputManager.Instance.moveVector.x;
-    }
-
-    protected void OnMoveCanceled()
-    {
-        throw new NotImplementedException();
-    }
-
 
     private void OnWallSlide()
     {
         if (player.isWallDetected() && !player.isGrounded() && rb.velocity.y <= 0)
+        {
             stateMachine.ChangeState(player.wallSlideState);
+        }
     }
 
-    private void SetYVelocityAnimatorParam()
+
+    private void SetAxis()
+    {
+        SetX();
+        SetY();
+    }
+
+    private void SetX()
+    {
+        if (player.canMove)
+        {
+            xInput = PlayerInputManager.Instance.moveVector.x;
+        }
+    }
+
+    /// <summary>
+    /// There is no Y Axis movement here, but we do set the Y value for the usage of the animation.
+    /// </summary>
+    private void SetY()
     {
         player.animator.SetFloat("yVelocity", rb.velocity.y);
     }
+
 
 }

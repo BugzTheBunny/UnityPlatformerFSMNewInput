@@ -7,11 +7,10 @@ using UnityEngine.InputSystem;
 public class PlayerInputManager : MonoBehaviour
 {
     public static PlayerInputManager Instance;
+
     public Vector2 moveVector { get; private set; }
 
-
-    [Header(" Components ")]
-    private PlayerActionAsset actions;
+    public PlayerActionAsset actions { get; private set; }
 
 
     [Header(" Actions ")]
@@ -19,8 +18,6 @@ public class PlayerInputManager : MonoBehaviour
     public static Action attackPerformed;
     public static Action dashPerformed;
     public static Action movePerformed;
-    public static Action moveCanceled;
-
 
     private void Awake()
     {
@@ -32,12 +29,12 @@ public class PlayerInputManager : MonoBehaviour
 
     private void OnEnable()
     {
-        Subscribe();
+        SetupInputsOnEnable();
     }
 
     private void OnDisable()
     {
-        Unsibscribe();
+        SetupInputsOnDisable();
     }
 
     void Start()
@@ -45,7 +42,7 @@ public class PlayerInputManager : MonoBehaviour
         actions = new PlayerActionAsset();
     }
 
-    private void Subscribe()
+    private void SetupInputsOnEnable()
     {
         actions = new PlayerActionAsset();
         actions.Enable();
@@ -59,7 +56,7 @@ public class PlayerInputManager : MonoBehaviour
 
 
 
-    private void Unsibscribe()
+    private void SetupInputsOnDisable()
     {
         actions.Player.Move.performed -= OnMovePerformed;
         actions.Player.Move.canceled -= OnMoveCanceled;
@@ -79,7 +76,6 @@ public class PlayerInputManager : MonoBehaviour
     private void OnMoveCanceled(InputAction.CallbackContext context)
     {
         moveVector = Vector2.zero;
-        moveCanceled?.Invoke();
     }
 
     private void OnAttackPerformed(InputAction.CallbackContext context)
