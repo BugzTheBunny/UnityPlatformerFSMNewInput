@@ -18,6 +18,7 @@ public class PlayerInputManager : MonoBehaviour
     public static Action attackPerformed;
     public static Action dashPerformed;
     public static Action movePerformed;
+    public static Action moveCanceled;
 
     private void Awake()
     {
@@ -76,6 +77,7 @@ public class PlayerInputManager : MonoBehaviour
     private void OnMoveCanceled(InputAction.CallbackContext context)
     {
         moveVector = Vector2.zero;
+        moveCanceled?.Invoke();
     }
 
     private void OnAttackPerformed(InputAction.CallbackContext context)

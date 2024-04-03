@@ -34,13 +34,22 @@ public class PlayerGroundedState : PlayerState
     private void Subscribe()
     {
         PlayerInputManager.jumpPerformed += OnJump;
+        PlayerInputManager.attackPerformed += OnAttack;
     }
+
 
     private void Unsubscribe()
     {
         PlayerInputManager.jumpPerformed -= OnJump;
+        PlayerInputManager.attackPerformed -= OnAttack;
 
     }
+
+    private void OnAttack()
+    {
+        stateMachine.ChangeState(player.primaryAttackState);
+    }
+
 
     private void OnJump()
     {

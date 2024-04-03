@@ -26,11 +26,13 @@ public class PlayerAirState : PlayerState
         base.Exit();
     }
 
+
+
     private void Move()
     {
         if (player.canMove)
         {
-            player.SetVelocity(xInput * player.moveSpeed, rb.velocity.y);
+            player.SetVelocity(xInput * player.airMoveSpeed, rb.velocity.y);
         }
     }
 }

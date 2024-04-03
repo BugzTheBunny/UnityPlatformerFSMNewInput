@@ -14,8 +14,12 @@ public class PlayerState
 
 
     [Header(" Settings ")]
-    protected float stateDuration; // Certein States have "time to be alive", like Dash.
-    protected float xInput;
+    protected float stateDuration;
+
+    [Header(" State / Triggers ")]
+    protected bool canAttack = true;
+    protected bool triggerCalled;
+    protected float xInput = 0;
 
     public PlayerState(Player _player, PlayerStateMachine _stateMachine, string animBoolName)
     {
@@ -25,31 +29,38 @@ public class PlayerState
     }
     public virtual void Enter()
     {
-        PlayerInputManager.Instance.actions.Player.Dash.performed += OnDashPerformed;
+        PlayerInputManager.dashPerformed += OnDashPerformed;
         player.animator.SetBool(_animBoolName, true);
         rb = player.rb;
+        triggerCalled = false;
     }
 
     public virtual void Update()
     {
         stateDuration -= Time.deltaTime;
-        SetAxis();
+        SetX();
+        SetY();
         if (player.canWallSlide)
             OnWallSlide();
+
     }
+
     public virtual void Exit()
     {
-        player.animator.SetBool(_animBoolName, false); // Ends animation on change.
-        PlayerInputManager.Instance.actions.Player.Dash.performed -= OnDashPerformed;
-
+        player.animator.SetBool(_animBoolName, false); 
+        PlayerInputManager.dashPerformed -= OnDashPerformed;
     }
 
-    private void OnDashPerformed(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    public virtual void AnimationFinishTrigger()
+    {
+        triggerCalled = true;
+    }
+
+    #region Shared across all states
+    private void OnDashPerformed()
     {
         if (player.canDash)
-        {
             stateMachine.ChangeState(player.dashState);
-        }
     }
 
     private void OnWallSlide()
@@ -60,28 +71,18 @@ public class PlayerState
         }
     }
 
-
-    private void SetAxis()
-    {
-        SetX();
-        SetY();
-    }
-
     private void SetX()
     {
         if (player.canMove)
-        {
             xInput = PlayerInputManager.Instance.moveVector.x;
-        }
     }
 
-    /// <summary>
-    /// There is no Y Axis movement here, but we do set the Y value for the usage of the animation.
-    /// </summary>
     private void SetY()
     {
         player.animator.SetFloat("yVelocity", rb.velocity.y);
     }
+    #endregion
+
 
 
 }

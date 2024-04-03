@@ -9,6 +9,8 @@ public class Player : MonoBehaviour
 {
     [Header(" Movement ")]
     [SerializeField] private float _moveSpeed = 8f; public float moveSpeed { get => _moveSpeed; }
+    [SerializeField] private float _airMoveSpeed = 8f; public float airMoveSpeed { get => _airMoveSpeed; }
+
     [SerializeField] private float _jumpForce = 15; public float jumpForce { get => _jumpForce; }
     [SerializeField] private float _wallJumpForce = 5f; public float wallJumpForce { get => _wallJumpForce; }
     [Range(0,1)]
@@ -51,6 +53,7 @@ public class Player : MonoBehaviour
     public PlayerWallJumpState  wallJumpState { get; private set; }
     public PlayerWallSlideState wallSlideState { get; private set; }
     public PlayerDashState dashState { get; private set; }
+    public PlayerPrimaryAttackState primaryAttackState { get; private set; }
 
     #endregion
 
@@ -86,8 +89,6 @@ public class Player : MonoBehaviour
     public void EnableDash() => canDash = true;
     public void DisableDash() => canDash = false;
 
-    #region OnInputEvents
-    // On Move Performed
     private void OnMovePerformed()
     {
         if (canMove)
@@ -119,7 +120,10 @@ public class Player : MonoBehaviour
             facingDirection = direction;
     }
 
-    // On Dash Performed
+    #region Triggers / Events
+
+    public void AnimationTrigger() => stateMachine.currentState.AnimationFinishTrigger();
+
     private void OnDashPerformed()
     {
         if (canDash)
@@ -144,6 +148,8 @@ public class Player : MonoBehaviour
         wallSlideState = new PlayerWallSlideState(this, stateMachine, "WallSlide");
         wallJumpState = new PlayerWallJumpState(this, stateMachine, "WallJump");
         dashState = new PlayerDashState(this, stateMachine, "Dash");
+        primaryAttackState = new PlayerPrimaryAttackState(this, stateMachine, "Attack");
+        
     }
     
     private void OnEnable()
