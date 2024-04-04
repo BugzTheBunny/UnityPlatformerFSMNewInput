@@ -8,10 +8,21 @@ public class PlayerPrimaryAttackState : PlayerState
     {
     }
 
+    private int comboCounter;
+
+    private float lastTimeAttacked;
+    private float comboWindow = 2;
+
     public override void Enter()
     {
         base.Enter();
-        player.SetVelocity(0, 0);
+        //player.SetVelocity(0, 0); // Stop on Attack
+        if (comboCounter > 2 || Time.time >= lastTimeAttacked + comboWindow)
+        {
+            comboCounter = 0;
+        }
+
+        player.animator.SetInteger("ComboCounter", comboCounter);
     }
 
     public override void Update()
@@ -27,6 +38,9 @@ public class PlayerPrimaryAttackState : PlayerState
     public override void Exit()
     {
         base.Exit();
+
+        comboCounter++;
+        lastTimeAttacked = Time.time;
     }
 
 }
