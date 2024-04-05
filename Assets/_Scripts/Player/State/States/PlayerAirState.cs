@@ -18,7 +18,7 @@ public class PlayerAirState : PlayerState
         base.Update();
         Move();
         if (rb.velocity.y == 0)
-            stateMachine.ChangeState(player.idleState);
+            stateMachine.ChangeState(stateMachine.idleState);
     }
 
     public override void Exit()

@@ -47,7 +47,7 @@ public class PlayerGroundedState : PlayerState
 
     private void OnAttack()
     {
-        stateMachine.ChangeState(player.primaryAttackState);
+        stateMachine.ChangeState(stateMachine.primaryAttackState);
     }
 
 
@@ -55,12 +55,12 @@ public class PlayerGroundedState : PlayerState
     {
         if (player.isGrounded())
             player.Flip();
-            stateMachine.ChangeState(player.jumpState);
+            stateMachine.ChangeState(stateMachine.jumpState);
     }
 
     private void CheckiIfIsFalling()
     { 
         if (rb.velocity.y < 0)
-            stateMachine.ChangeState(player.airState);
+            stateMachine.ChangeState(stateMachine.airState);
     }
 }

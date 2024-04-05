@@ -24,7 +24,7 @@ public class PlayerWallSlideState : PlayerState
     {
         base.Update();
         Slide();
-        CheckIfChangeState();
+        IsOnWall();
     }
 
     
@@ -40,26 +40,19 @@ public class PlayerWallSlideState : PlayerState
     {
         player.SetFacingDirection(-player.facingDirection);
         player.Flip();
-        stateMachine.ChangeState(player.wallJumpState);
+        stateMachine.ChangeState(stateMachine.wallJumpState);
     }
 
 
     private void Slide()
     {
        player.SetVelocity(xInput, rb.velocity.y * player.wallSlideSpeed);
-
     }
 
-    /// <summary>
-    /// If not movement on Y || wall not detected || player not sticking to wall via input.
-    /// </summary>
-    private void CheckIfChangeState()
+    private void IsOnWall()
     {
         if (rb.velocity.y == 0 || !player.isWallDetected())
-        {
-            Debug.Log("Left Wall Slide");
-            stateMachine.ChangeState(player.idleState);
-        }
+            stateMachine.ChangeState(stateMachine.idleState);
     }
 
     

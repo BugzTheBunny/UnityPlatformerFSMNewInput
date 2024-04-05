@@ -35,7 +35,7 @@ public class PlayerPrimaryAttackState : PlayerState
             player.SetVelocity(0, 0);
 
         if (triggerCalled)
-            stateMachine.ChangeState(player.idleState);
+            stateMachine.ChangeState(stateMachine.idleState);
     }
 
     public override void Exit()

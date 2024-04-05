@@ -61,14 +61,14 @@ public class PlayerState
     private void OnDashPerformed()
     {
         if (player.canDash)
-            stateMachine.ChangeState(player.dashState);
+            stateMachine.ChangeState(stateMachine.dashState);
     }
 
     private void OnWallSlide()
     {
         if (player.isWallDetected() && !player.isGrounded() && rb.velocity.y <= 0)
         {
-            stateMachine.ChangeState(player.wallSlideState);
+            stateMachine.ChangeState(stateMachine.wallSlideState);
         }
     }
 

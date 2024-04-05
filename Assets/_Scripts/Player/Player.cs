@@ -7,6 +7,9 @@ using UnityEngine.Windows;
 
 public class Player : MonoBehaviour
 {
+
+    public static Player instance;
+
     [Header(" Movement ")]
     [SerializeField] private float _moveSpeed = 8f; public float moveSpeed { get => _moveSpeed; }
     [SerializeField] private float _airMoveSpeed = 8f; public float airMoveSpeed { get => _airMoveSpeed; }
@@ -17,7 +20,7 @@ public class Player : MonoBehaviour
     [SerializeField] public float _wallSlideSpeed = 0.5f; public float wallSlideSpeed { get => _wallSlideSpeed; }
     [SerializeField] public bool _canWallSlide; public bool canWallSlide { get => _canWallSlide; }
     public int facingDirection { get; private set; }
-    [SerializeField] private bool _canMove; public bool canMove{ get => _canMove; }
+    [SerializeField] private bool _canMove = true; public bool canMove{ get => _canMove; }
     
 
     [Header(" Dash ")]
@@ -25,7 +28,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float _dashDuration; public float dashDuration{ get => _dashDuration; private set => _dashDuration = value; }
     [SerializeField] private float _dashCooldown; public float dashCooldown{ get => _dashCooldown; private set => _dashCooldown = value; }
     [HideInInspector] private int _dashDirection = 1; public int dashDirection { get => _dashDirection; private set => _dashDirection = value; }
-    [SerializeField] private bool _canDash; public bool canDash { get => _canDash; private set => _canDash = value; }
+    [SerializeField] private bool _canDash = true; public bool canDash { get => _canDash; private set => _canDash = value; }
 
     [Header(" Ground Collision ")]
     [SerializeField] private LayerMask whatIsGround;
@@ -42,39 +45,27 @@ public class Player : MonoBehaviour
     #region [--- Components ---]
     public Animator animator { get; private set; }
     public Rigidbody2D rb { get; private set; }
-    public PlayerStateMachine stateMachine { get; private set; }
+    private PlayerStateMachine stateMachine;
 
     #endregion
-
-    #region [--- States ---]
-    public PlayerIdleState idleState { get; private set; }
-    public PlayerMoveState moveState { get; private set; }
-    public PlayerJumpState jumpState { get; private set; }
-    public PlayerAirState airState { get; private set; }
-    public PlayerWallJumpState  wallJumpState { get; private set; }
-    public PlayerWallSlideState wallSlideState { get; private set; }
-    public PlayerDashState dashState { get; private set; }
-    public PlayerPrimaryAttackState primaryAttackState { get; private set; }
-
-    #endregion
-
 
     private void Awake()
     {
-        SetStates();
+        if (instance == null)
+            instance = this;
+        else
+            Destroy(gameObject);
+
     }
 
     private void Start()
     {
         animator = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody2D>();
-        stateMachine.Initialize(idleState);
-        EnableMovement();
-        EnableDash();
+        stateMachine = new PlayerStateMachine();
+        stateMachine.Initialize();
         facingDirection = 1;
     }
-
-
 
     private void Update()
     {
@@ -85,10 +76,7 @@ public class Player : MonoBehaviour
     {
         rb.velocity = new Vector2(vX, vY);
     }
-    public void EnableMovement() => _canMove = true;
-    public void DisableMovement() => _canMove = false;
-    public void EnableDash() => canDash = true;
-    public void DisableDash() => canDash = false;
+
 
     private void OnMovePerformed()
     {
@@ -121,27 +109,16 @@ public class Player : MonoBehaviour
             facingDirection = direction;
     }
 
+
     #region Triggers / Events
-
+    public void EnableMovement() => _canMove = true;
+    public void DisableMovement() => _canMove = false;
+    public void EnableDash() => _canDash = true;
+    public void DisableDash() => _canDash = false;
     public void AnimationTrigger() => stateMachine.currentState.AnimationFinishTrigger();
-
-
     #endregion
 
     #region Initalization
-    private void SetStates()
-    {
-        stateMachine = new PlayerStateMachine();
-        idleState = new PlayerIdleState(this, stateMachine, "Idle");
-        moveState = new PlayerMoveState(this, stateMachine, "Move");
-        jumpState = new PlayerJumpState(this, stateMachine, "Jump");
-        airState = new PlayerAirState(this, stateMachine, "Jump");
-        wallSlideState = new PlayerWallSlideState(this, stateMachine, "WallSlide");
-        wallJumpState = new PlayerWallJumpState(this, stateMachine, "WallJump");
-        dashState = new PlayerDashState(this, stateMachine, "Dash");
-        primaryAttackState = new PlayerPrimaryAttackState(this, stateMachine, "Attack");
-        
-    }
     
     private void OnEnable()
     {
@@ -164,7 +141,6 @@ public class Player : MonoBehaviour
     {
         Gizmos.DrawWireCube(transform.position - transform.up * groundCastDistance, groundCheckBoxSize); // GroundCheck
         Gizmos.DrawLine(transform.position, new Vector3(transform.position.x + wallCastDistance * facingDirection, transform.position.y)); // WallCheck
-
     }
 
     #endregion

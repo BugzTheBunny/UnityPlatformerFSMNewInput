@@ -32,6 +32,6 @@ public class PlayerMoveState : PlayerGroundedState
         if (player.canMove)
             player.SetVelocity(xInput * player.moveSpeed, rb.velocity.y);
             if (xInput == 0)
-                stateMachine.ChangeState(player.idleState);
+                stateMachine.ChangeState(stateMachine.idleState);
     }
 }

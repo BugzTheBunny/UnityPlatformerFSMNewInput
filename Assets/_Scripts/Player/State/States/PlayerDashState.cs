@@ -22,7 +22,7 @@ public class PlayerDashState : PlayerState
         base.Update();
         player.SetVelocity(player.dashSpeed * player.dashDirection, 0);
         if (stateDuration < 0)
-            stateMachine.ChangeState(player.idleState);
+            stateMachine.ChangeState(stateMachine.idleState);
     }
 
     public override void Exit()
