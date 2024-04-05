@@ -1,19 +1,16 @@
 using System;
-using System.Collections;
-using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.Windows;
 
 public class Player : MonoBehaviour
 {
 
     public static Player instance;
 
+    
+
     [Header(" Movement ")]
     [SerializeField] private float _moveSpeed = 8f; public float moveSpeed { get => _moveSpeed; }
     [SerializeField] private float _airMoveSpeed = 8f; public float airMoveSpeed { get => _airMoveSpeed; }
-
     [SerializeField] private float _jumpForce = 15; public float jumpForce { get => _jumpForce; }
     [SerializeField] private float _wallJumpForce = 5f; public float wallJumpForce { get => _wallJumpForce; }
     [Range(0,1)]
@@ -40,6 +37,12 @@ public class Player : MonoBehaviour
     [SerializeField] private LayerMask whatIsWall;
     [SerializeField] private float wallCastDistance;
 
+    [Header(" Attack Settings ")]
+    /// The amount in this field should be the same amount as attacks you have, this will make the player move a bit per attack 
+    /// (view PrimaryAttackState.cs) to see exection.
+    [SerializeField] public float[] attackMovement;
+
+    // Misc
     public bool isBusy {  get; private set; }
 
     #region [--- Components ---]
@@ -60,11 +63,11 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
+        facingDirection = 1;
         animator = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody2D>();
         stateMachine = new PlayerStateMachine();
         stateMachine.Initialize();
-        facingDirection = 1;
     }
 
     private void Update()

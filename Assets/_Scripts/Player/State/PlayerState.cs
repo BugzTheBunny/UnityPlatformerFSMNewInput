@@ -30,6 +30,7 @@ public class PlayerState
     }
     public virtual void Enter()
     {
+        Debug.Log("Entered State : " + this.ToString());
         PlayerInputManager.dashPerformed += OnDashPerformed;
         player.animator.SetBool(_animBoolName, true);
         rb = player.rb;

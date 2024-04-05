@@ -824,11 +824,11 @@ MonoBehaviour:
   _wallJumpForce: 7
   _wallSlideSpeed: 0.5
   _canWallSlide: 1
-  _canMove: 0
+  _canMove: 1
   _dashSpeed: 35
   _dashDuration: 0.2
   _dashCooldown: 1
-  canDash: 0
+  _canDash: 0
   whatIsGround:
     serializedVersion: 2
     m_Bits: 8
@@ -838,6 +838,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   wallCastDistance: 0.26
+  attackMovement:
+  - 2
+  - 1
+  - 10
 --- !u!4 &981475704
 Transform:
   m_ObjectHideFlags: 0

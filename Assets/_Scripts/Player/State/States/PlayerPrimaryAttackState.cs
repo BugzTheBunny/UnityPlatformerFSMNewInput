@@ -25,6 +25,7 @@ public class PlayerPrimaryAttackState : PlayerState
         }
         stateDuration = inertionTime;
         player.animator.SetInteger("ComboCounter", comboCounter);
+        player.SetVelocity(player.attackMovement[comboCounter] * player.facingDirection, rb.velocity.y);
     }
 
     public override void Update()
