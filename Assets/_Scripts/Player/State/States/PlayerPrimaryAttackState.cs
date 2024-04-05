@@ -13,6 +13,8 @@ public class PlayerPrimaryAttackState : PlayerState
     private float lastTimeAttacked;
     private float comboWindow = 2;
 
+    private float inertionTime = .1f;
+
     public override void Enter()
     {
         base.Enter();
@@ -21,24 +23,25 @@ public class PlayerPrimaryAttackState : PlayerState
         {
             comboCounter = 0;
         }
-
+        stateDuration = inertionTime;
         player.animator.SetInteger("ComboCounter", comboCounter);
     }
 
     public override void Update()
     {
         base.Update();
-        
+
+        if (stateDuration < 0)
+            player.SetVelocity(0, 0);
+
         if (triggerCalled)
-        {
             stateMachine.ChangeState(player.idleState);
-        }
     }
 
     public override void Exit()
     {
         base.Exit();
-
+        player.StartCoroutine(DelayFor(.1f));
         comboCounter++;
         lastTimeAttacked = Time.time;
     }

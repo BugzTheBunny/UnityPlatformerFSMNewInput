@@ -12,8 +12,9 @@ public class PlayerDashState : PlayerState
     public override void Enter()
     {
         base.Enter();
+        player.StartCoroutine(DashCooldownRoutine(player.dashCooldown));
         stateDuration = player.dashDuration;
-        player.canDash = false;
+        player.DisableDash();
     }
 
     public override void Update()
@@ -28,6 +29,12 @@ public class PlayerDashState : PlayerState
     {
         base.Exit();
         player.SetVelocity(0, rb.velocity.y);
-    }   
+    }
+
+    public IEnumerator DashCooldownRoutine(float time)
+    {
+        yield return new WaitForSeconds(time);
+        player.EnableDash();
+    }
 
 }

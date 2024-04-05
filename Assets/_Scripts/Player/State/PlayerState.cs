@@ -19,6 +19,7 @@ public class PlayerState
     [Header(" State / Triggers ")]
     protected bool canAttack = true;
     protected bool triggerCalled;
+    protected bool isBusy = false;
     protected float xInput = 0;
 
     public PlayerState(Player _player, PlayerStateMachine _stateMachine, string animBoolName)
@@ -80,6 +81,17 @@ public class PlayerState
     private void SetY()
     {
         player.animator.SetFloat("yVelocity", rb.velocity.y);
+    }
+
+    protected IEnumerator DelayFor(float _seconds)
+    {
+        isBusy = true;
+        Debug.Log("Delay Start");
+        player.DisableMovement();
+        yield return new WaitForSeconds(_seconds);
+        Debug.Log("Delay End");
+        player.EnableMovement();
+        isBusy = false;
     }
     #endregion
 

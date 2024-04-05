@@ -25,7 +25,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float _dashDuration; public float dashDuration{ get => _dashDuration; private set => _dashDuration = value; }
     [SerializeField] private float _dashCooldown; public float dashCooldown{ get => _dashCooldown; private set => _dashCooldown = value; }
     [HideInInspector] private int _dashDirection = 1; public int dashDirection { get => _dashDirection; private set => _dashDirection = value; }
-    public bool canDash;
+    [SerializeField] private bool _canDash; public bool canDash { get => _canDash; private set => _canDash = value; }
 
     [Header(" Ground Collision ")]
     [SerializeField] private LayerMask whatIsGround;
@@ -37,6 +37,7 @@ public class Player : MonoBehaviour
     [SerializeField] private LayerMask whatIsWall;
     [SerializeField] private float wallCastDistance;
 
+    public bool isBusy {  get; private set; }
 
     #region [--- Components ---]
     public Animator animator { get; private set; }
@@ -124,17 +125,7 @@ public class Player : MonoBehaviour
 
     public void AnimationTrigger() => stateMachine.currentState.AnimationFinishTrigger();
 
-    private void OnDashPerformed()
-    {
-        if (canDash)
-            StartCoroutine(DashCooldownRoutine(dashCooldown));
-    }
 
-    IEnumerator DashCooldownRoutine(float time)
-    {
-        yield return new WaitForSeconds(time);
-        canDash = true;
-    }
     #endregion
 
     #region Initalization
@@ -155,15 +146,11 @@ public class Player : MonoBehaviour
     private void OnEnable()
     {
         PlayerInputManager.movePerformed += OnMovePerformed;
-        PlayerInputManager.dashPerformed += OnDashPerformed;
     }
-
-
 
     private void OnDisable()
     {
         PlayerInputManager.movePerformed -= OnMovePerformed;
-        PlayerInputManager.dashPerformed -= OnDashPerformed;
 
     }
 
