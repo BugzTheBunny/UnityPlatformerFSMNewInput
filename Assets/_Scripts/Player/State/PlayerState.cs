@@ -30,7 +30,6 @@ public class PlayerState
     }
     public virtual void Enter()
     {
-        Debug.Log("Entered State : " + this.ToString());
         PlayerInputManager.dashPerformed += OnDashPerformed;
         player.animator.SetBool(_animBoolName, true);
         rb = player.rb;
@@ -75,8 +74,7 @@ public class PlayerState
 
     private void SetX()
     {
-        if (player.canMove)
-            xInput = PlayerInputManager.Instance.moveVector.x;
+        xInput = Player.instance.moveDirection;
     }
 
     private void SetY()
@@ -84,13 +82,11 @@ public class PlayerState
         player.animator.SetFloat("yVelocity", rb.velocity.y);
     }
 
-    protected IEnumerator DelayFor(float _seconds)
+    protected IEnumerator BusyFor(float _seconds)
     {
         isBusy = true;
-        Debug.Log("Delay Start");
         player.DisableMovement();
         yield return new WaitForSeconds(_seconds);
-        Debug.Log("Delay End");
         player.EnableMovement();
         isBusy = false;
     }

@@ -78,6 +78,7 @@ public class PlayerInputManager : MonoBehaviour
     {
         moveVector = Vector2.zero;
         moveCanceled?.Invoke();
+        Debug.Log("Invoked!");
     }
 
     private void OnAttackPerformed(InputAction.CallbackContext context)

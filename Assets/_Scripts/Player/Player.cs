@@ -18,7 +18,7 @@ public class Player : MonoBehaviour
     [SerializeField] public bool _canWallSlide; public bool canWallSlide { get => _canWallSlide; }
     public int facingDirection { get; private set; }
     [SerializeField] private bool _canMove = true; public bool canMove{ get => _canMove; }
-    
+    public int moveDirection { get; private set; }
 
     [Header(" Dash ")]
     [SerializeField] private float _dashSpeed; public float dashSpeed { get => _dashSpeed; private set => _dashSpeed = value; }
@@ -38,8 +38,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float wallCastDistance;
 
     [Header(" Attack Settings ")]
-    /// The amount in this field should be the same amount as attacks you have, this will make the player move a bit per attack 
-    /// (view PrimaryAttackState.cs) to see exection.
+    [Tooltip("The amount in this field should be the same amount as attacks you have, this will make the player move a bit per attack ")]
     [SerializeField] public float[] attackMovement;
 
     // Misc
@@ -84,13 +83,18 @@ public class Player : MonoBehaviour
     private void OnMovePerformed()
     {
         if (canMove)
-            HandleDirection();
+        {
+            SetXDirection();
+            SetFacingDirection();
+            Flip();
+        }
+
     }
 
-    private void HandleDirection()
+    private void OnMoveCanceled()
     {
-        SetFacingDirection();
-        Flip();
+        moveDirection = 0;
+        Debug.Log("Stopped Moving");
     }
 
     public void Flip()
@@ -99,11 +103,15 @@ public class Player : MonoBehaviour
         dashDirection = facingDirection == 0 ? 1 : facingDirection;
     }
 
+    private void SetXDirection()
+    {
+        moveDirection = (int)PlayerInputManager.Instance.moveVector.x;
+    }
+
     private void SetFacingDirection()
     {
-        int xInput = (int)PlayerInputManager.Instance.moveVector.x;
-        if (xInput != 0)
-            facingDirection = xInput;
+        if (moveDirection != 0)
+            facingDirection = moveDirection;
     }
 
     public void SetFacingDirection(int direction)
@@ -126,11 +134,14 @@ public class Player : MonoBehaviour
     private void OnEnable()
     {
         PlayerInputManager.movePerformed += OnMovePerformed;
+        PlayerInputManager.moveCanceled += OnMoveCanceled;
+
     }
 
     private void OnDisable()
     {
         PlayerInputManager.movePerformed -= OnMovePerformed;
+        PlayerInputManager.moveCanceled -= OnMoveCanceled;
 
     }
 
@@ -138,8 +149,7 @@ public class Player : MonoBehaviour
 
     #region Checks & Gizmos
     public bool isGrounded() => Physics2D.BoxCast(transform.position, groundCheckBoxSize, 0, -transform.up, groundCastDistance, whatIsGround); // GroundCheck
-    public bool isWallDetected() => Physics2D.Raycast(transform.position, Vector2.right * facingDirection, wallCastDistance, whatIsWall); // WallCheck
-
+    public bool isWallDetected() => Physics2D.Raycast(transform.position, Vector2.right * facingDirection, wallCastDistance, whatIsWall);
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireCube(transform.position - transform.up * groundCastDistance, groundCheckBoxSize); // GroundCheck
