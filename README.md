@@ -32,6 +32,6 @@ This repo contains an example of a Finite state machine, using the new Input Sys
 ![attack](GifAnims/combo_attack.gif)
 
 ## Todo:
-1. 
+1. Double Jump
 2. Air Attack State
 3. Edge Climb State
