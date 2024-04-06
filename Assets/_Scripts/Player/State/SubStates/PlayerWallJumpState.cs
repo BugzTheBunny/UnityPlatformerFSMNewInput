@@ -19,7 +19,7 @@ public class PlayerWallJumpState : PlayerState
     public override void Update()
     {
         base.Update();
-        if ( player.isGrounded())
+        if ( player.IsGrounded())
         {
             stateMachine.ChangeState(stateMachine.idleState);
         }

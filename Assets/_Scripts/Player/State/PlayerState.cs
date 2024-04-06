@@ -66,7 +66,7 @@ public class PlayerState
 
     private void OnWallSlide()
     {
-        if (player.isWallDetected() && !player.isGrounded() && rb.velocity.y <= 0)
+        if (player.IsWallDetected() && !player.IsGrounded() && rb.velocity.y <= 0)
         {
             stateMachine.ChangeState(stateMachine.wallSlideState);
         }

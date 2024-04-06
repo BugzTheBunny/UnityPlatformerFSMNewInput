@@ -8,6 +8,7 @@ public class PlayerAirState : PlayerState
     {
     }
 
+
     public override void Enter()
     {
         base.Enter();
@@ -17,6 +18,7 @@ public class PlayerAirState : PlayerState
     {
         base.Update();
         Move();
+        LedgeDetection();
         if (rb.velocity.y == 0)
             stateMachine.ChangeState(stateMachine.idleState);
     }
@@ -31,8 +33,14 @@ public class PlayerAirState : PlayerState
     private void Move()
     {
         if (player.canMove)
-        {
             player.SetVelocity(xInput * player.airMoveSpeed, rb.velocity.y);
-        }
     }
+
+    private void LedgeDetection()
+    {
+        if (player.IsLedgeDetected())
+            Debug.Log("Edge Detected!");
+        
+    }
+
 }

@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System;
 using UnityEngine;
 
@@ -5,8 +6,6 @@ public class Player : MonoBehaviour
 {
 
     public static Player instance;
-
-    
 
     [Header(" Movement ")]
     [SerializeField] private float _moveSpeed = 8f; public float moveSpeed { get => _moveSpeed; }
@@ -37,6 +36,19 @@ public class Player : MonoBehaviour
     [SerializeField] private LayerMask whatIsWall;
     [SerializeField] private float wallCastDistance;
 
+    [Header(" Ledge Rays Parameters ")]
+    [SerializeField] private float ledgeRaysDistance;
+    [SerializeField] private float ledgeRaysSpacing;
+    [SerializeField] private Vector3 ledgeRaysPositionOffset;
+    private bool topLedgeRayDetected;
+    private bool bottomLedgeRayDetected;
+
+    [Header(" Rays Info ")]
+    private Vector3 topRayStartPosition;
+    private Vector3 topRayDestination;
+    private Vector3 bottomRayStartPosition;
+    private Vector3 bottomRayDestination;
+
     [Header(" Attack Settings ")]
     [Tooltip("The amount in this field should be the same amount as attacks you have, this will make the player move a bit per attack ")]
     [SerializeField] public float[] attackMovement;
@@ -62,9 +74,9 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
-        facingDirection = 1;
         animator = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody2D>();
+        facingDirection = 1;
         stateMachine = new PlayerStateMachine();
         stateMachine.Initialize();
     }
@@ -72,6 +84,7 @@ public class Player : MonoBehaviour
     private void Update()
     {
         stateMachine.currentState.Update();
+        
     }
 
     public void SetVelocity(float vX, float vY)
@@ -94,7 +107,6 @@ public class Player : MonoBehaviour
     private void OnMoveCanceled()
     {
         moveDirection = 0;
-        Debug.Log("Stopped Moving");
     }
 
     public void Flip()
@@ -107,7 +119,6 @@ public class Player : MonoBehaviour
     {
         moveDirection = (int)PlayerInputManager.Instance.moveVector.x;
     }
-
     private void SetFacingDirection()
     {
         if (moveDirection != 0)
@@ -148,13 +159,53 @@ public class Player : MonoBehaviour
     #endregion
 
     #region Checks & Gizmos
-    public bool isGrounded() => Physics2D.BoxCast(transform.position, groundCheckBoxSize, 0, -transform.up, groundCastDistance, whatIsGround); // GroundCheck
-    public bool isWallDetected() => Physics2D.Raycast(transform.position, Vector2.right * facingDirection, wallCastDistance, whatIsWall);
+    public bool DetectLedges() 
+    {
+        TopRayDetection();
+        BottomRayDetection();
+        return (!topLedgeRayDetected && bottomLedgeRayDetected);
+
+    }
+    public bool IsGrounded() => Physics2D.BoxCast(transform.position, groundCheckBoxSize, 0, -transform.up, groundCastDistance, whatIsGround); // GroundCheck
+    public bool IsWallDetected() => Physics2D.Raycast(transform.position, Vector2.right * facingDirection, wallCastDistance, whatIsWall);
+
+    public bool IsLedgeDetected() => DetectLedges();
+    private void TopRayDetection()
+    {
+        float xStart = transform.position.x + ledgeRaysPositionOffset.x;
+        float yStart = transform.position.y + ledgeRaysPositionOffset.y + ledgeRaysSpacing;
+        topRayStartPosition = new Vector3(xStart,yStart);
+        topRayDestination = new Vector3(xStart + ledgeRaysDistance * facingDirection, yStart);
+
+        topLedgeRayDetected = RayCastDetectWall(topRayStartPosition, ledgeRaysDistance);
+    }
+    private void BottomRayDetection()
+    {
+        float xStart = transform.position.x + ledgeRaysPositionOffset.x;
+        float yStart = transform.position.y + ledgeRaysPositionOffset.y - ledgeRaysSpacing;
+        bottomRayStartPosition = new Vector2(xStart,yStart);
+        bottomRayDestination = new Vector3(xStart + ledgeRaysDistance * facingDirection, yStart);
+        bottomLedgeRayDetected = RayCastDetectWall(bottomRayStartPosition, ledgeRaysDistance);
+    }
+
+    private bool RayCastDetectWall(Vector2 startPosition, float distance)
+    {
+        Vector3 start = new Vector3(startPosition.x ,startPosition.y, 0);
+        return Physics2D.Raycast(start, Vector2.right * facingDirection, distance, whatIsWall);
+    }
+
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireCube(transform.position - transform.up * groundCastDistance, groundCheckBoxSize); // GroundCheck
         Gizmos.DrawLine(transform.position, new Vector3(transform.position.x + wallCastDistance * facingDirection, transform.position.y)); // WallCheck
+
+        // Ledge Detection
+        Gizmos.color = topLedgeRayDetected ? Color.green : Color.grey;
+        Gizmos.DrawLine(topRayStartPosition, topRayDestination);
+        Gizmos.color = bottomLedgeRayDetected ? Color.green : Color.grey;
+        Gizmos.DrawLine(bottomRayStartPosition, bottomRayDestination);
     }
+
 
     #endregion
 }

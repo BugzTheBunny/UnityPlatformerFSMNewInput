@@ -12,7 +12,7 @@ public class PlayerIdleState : PlayerGroundedState
     {
 
         base.Enter();
-        if (player.isGrounded())
+        if (player.IsGrounded())
             player.SetVelocity(0, 0);
     }
 

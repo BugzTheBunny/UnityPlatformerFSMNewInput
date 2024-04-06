@@ -53,7 +53,7 @@ public class PlayerGroundedState : PlayerState
 
     private void OnJump()
     {
-        if (player.isGrounded())
+        if (player.IsGrounded())
             player.Flip();
             stateMachine.ChangeState(stateMachine.jumpState);
     }

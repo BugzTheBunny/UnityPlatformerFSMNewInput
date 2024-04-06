@@ -51,7 +51,7 @@ public class PlayerWallSlideState : PlayerState
 
     private void IsOnWall()
     {
-        if (rb.velocity.y == 0 || !player.isWallDetected())
+        if (rb.velocity.y == 0 || !player.IsWallDetected())
             stateMachine.ChangeState(stateMachine.idleState);
     }
 
