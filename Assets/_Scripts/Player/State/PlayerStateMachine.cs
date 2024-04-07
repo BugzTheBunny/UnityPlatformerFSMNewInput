@@ -7,7 +7,9 @@ using UnityEngine.Playables;
 public class PlayerStateMachine
 {
     public PlayerState currentState { get; private set; }
-    private Player player = Player.instance;
+    public Animation currentStateAnimation { get; private set; }
+    private Player player;
+    private Animator animator;
 
     #region [--- States ---]
     public PlayerIdleState idleState { get; private set; }
@@ -22,6 +24,7 @@ public class PlayerStateMachine
 
     public void Initialize()
     {
+        SetOnInit();
         CreateStateMachine();
         currentState = idleState;
         currentState.Enter();
@@ -45,6 +48,12 @@ public class PlayerStateMachine
         dashState = new PlayerDashState(player, this, "Dash");
         primaryAttackState = new PlayerPrimaryAttackState(player, this, "Attack");
 
+    }
+
+    private void SetOnInit()
+    {
+        player = Player.instance;
+        animator = player.GetComponentInChildren<Animator>();
     }
 
 }
