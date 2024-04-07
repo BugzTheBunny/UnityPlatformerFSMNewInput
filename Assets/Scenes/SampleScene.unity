@@ -838,8 +838,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   wallCastDistance: 0.26
-  ledgeRaysDistance: 0.5
-  ledgeRaysSpacing: 0.1
+  ledgeRaysDistance: 0.4
+  ledgeRaysSpacing: 0.05
   ledgeRaysPositionOffset: {x: 0.1, y: 0.5, z: 0}
   attackMovement:
   - 2

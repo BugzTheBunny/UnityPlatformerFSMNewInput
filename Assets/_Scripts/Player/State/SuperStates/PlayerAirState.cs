@@ -11,6 +11,7 @@ public class PlayerAirState : PlayerState
     public override void Enter()
     {
         base.Enter();
+        Subscribe();
     }
 
     public override void Update()
@@ -25,9 +26,24 @@ public class PlayerAirState : PlayerState
     public override void Exit()
     {
         base.Exit();
+        Unsubscribe();
+    }
+
+    private void Subscribe()
+    {
+        PlayerInputManager.attackPerformed += OnAttack;
     }
 
 
+    private void Unsubscribe()
+    {
+        PlayerInputManager.attackPerformed -= OnAttack;
+    }
+
+    private void OnAttack()
+    {
+        stateMachine.ChangeState(stateMachine.airAttackState);
+    }
 
     private void Move()
     {
@@ -38,7 +54,7 @@ public class PlayerAirState : PlayerState
     private void LedgeDetection()
     {
         if (player.IsLedgeDetected())
-            Debug.Log("Edge Detected!");
+            stateMachine.ChangeState(stateMachine.ledgeGrabState);
         
     }
 

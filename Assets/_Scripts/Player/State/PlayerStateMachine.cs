@@ -19,6 +19,8 @@ public class PlayerStateMachine
     public PlayerWallSlideState wallSlideState { get; private set; }
     public PlayerDashState dashState { get; private set; }
     public PlayerPrimaryAttackState primaryAttackState { get; private set; }
+    public PlayerAirAttackState airAttackState { get; private set; }
+    public PlayerLedgeGrabState ledgeGrabState{ get; private set; }
     #endregion
 
     public void Initialize()
@@ -40,12 +42,19 @@ public class PlayerStateMachine
     {
         idleState = new PlayerIdleState(player, this, "player_idle");
         moveState = new PlayerMoveState(player, this, "player_move");
+        
         jumpState = new PlayerJumpState(player, this, "air_state");
         airState = new PlayerAirState(player, this, "air_state");
-        wallSlideState = new PlayerWallSlideState(player, this, "player_wallslide");
         wallJumpState = new PlayerWallJumpState(player, this, "air_state");
+        airAttackState = new PlayerAirAttackState(player, this, "player_air_attack");
+
+        wallSlideState = new PlayerWallSlideState(player, this, "player_wallslide");
+        ledgeGrabState = new PlayerLedgeGrabState(player, this, "player_wallslide");
+
         dashState = new PlayerDashState(player, this, "player_dash");
+
         primaryAttackState = new PlayerPrimaryAttackState(player, this, "player_attack");
+
 
     }
 

@@ -42,7 +42,6 @@ public class PlayerGroundedState : PlayerState
     {
         PlayerInputManager.jumpPerformed -= OnJump;
         PlayerInputManager.attackPerformed -= OnAttack;
-
     }
 
     private void OnAttack()

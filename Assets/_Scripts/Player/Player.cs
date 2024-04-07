@@ -37,6 +37,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float wallCastDistance;
 
     [Header(" Ledge Rays Parameters ")]
+    private bool ledgeRaysEnabled = true;
     [SerializeField] private float ledgeRaysDistance;
     [SerializeField] private float ledgeRaysSpacing;
     [SerializeField] private Vector3 ledgeRaysPositionOffset;
@@ -48,6 +49,7 @@ public class Player : MonoBehaviour
     private Vector3 topRayDestination;
     private Vector3 bottomRayStartPosition;
     private Vector3 bottomRayDestination;
+    
 
     [Header(" Attack Settings ")]
     [Tooltip("The amount in this field should be the same amount as attacks you have, this will make the player move a bit per attack ")]
@@ -137,6 +139,13 @@ public class Player : MonoBehaviour
     public void DisableMovement() => _canMove = false;
     public void EnableDash() => _canDash = true;
     public void DisableDash() => _canDash = false;
+    public void EnableGravity() => this.rb.simulated = true;
+    public void DisableGravity() => this.rb.simulated = false;
+    public void EnableLedgeRays() => ledgeRaysEnabled = true;
+    public void DisableLedgeRays() => ledgeRaysEnabled = false;
+
+
+
     public void AnimationTrigger() => stateMachine.currentState.AnimationFinishTrigger();
     #endregion
 
@@ -161,9 +170,14 @@ public class Player : MonoBehaviour
     #region Checks & Gizmos
     public bool DetectLedges() 
     {
-        TopRayDetection();
-        BottomRayDetection();
-        return (!topLedgeRayDetected && bottomLedgeRayDetected);
+        if(ledgeRaysEnabled)
+        {
+            TopRayDetection();
+            BottomRayDetection();
+            return (!topLedgeRayDetected && bottomLedgeRayDetected);
+        }
+        return false;
+
 
     }
     public bool IsGrounded() => Physics2D.BoxCast(transform.position, groundCheckBoxSize, 0, -transform.up, groundCastDistance, whatIsGround); // GroundCheck
