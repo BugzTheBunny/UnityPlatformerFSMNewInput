@@ -4,10 +4,9 @@ using UnityEngine;
 
 public class PlayerAirState : PlayerState
 {
-    public PlayerAirState(Player _player, PlayerStateMachine _stateMachine, string animBoolName) : base(_player, _stateMachine, animBoolName)
+    public PlayerAirState(Player _player, PlayerStateMachine _stateMachine , string animName) : base(_player, _stateMachine, animName)
     {
     }
-
 
     public override void Enter()
     {

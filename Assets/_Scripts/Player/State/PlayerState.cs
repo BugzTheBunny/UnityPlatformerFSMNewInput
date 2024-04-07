@@ -10,11 +10,11 @@ public class PlayerState
     protected PlayerStateMachine stateMachine;
     protected Player player;
     protected Rigidbody2D rb;
-    private string _animBoolName;
-
 
     [Header(" Settings ")]
     protected float stateDuration;
+    private string _animName;
+    protected int animIndex = -1;
 
     [Header(" State / Triggers ")]
     protected bool canAttack = true;
@@ -22,16 +22,17 @@ public class PlayerState
     protected bool isBusy = false;
     protected float xInput = 0;
 
-    public PlayerState(Player _player, PlayerStateMachine _stateMachine, string animBoolName)
+    public PlayerState(Player _player, PlayerStateMachine _stateMachine, string animName)
     {
         player = _player;
         stateMachine = _stateMachine;
-        this._animBoolName = animBoolName;
+        this._animName = animName;
     }
+
     public virtual void Enter()
     {
         PlayerInputManager.dashPerformed += OnDashPerformed;
-        player.animator.SetBool(_animBoolName, true);
+        PlayAnimation();
         rb = player.rb;
         triggerCalled = false;
     }
@@ -48,7 +49,6 @@ public class PlayerState
 
     public virtual void Exit()
     {
-        player.animator.SetBool(_animBoolName, false); 
         PlayerInputManager.dashPerformed -= OnDashPerformed;
     }
 
@@ -91,6 +91,17 @@ public class PlayerState
         isBusy = false;
     }
     #endregion
+
+    private void PlayAnimation()
+    {
+        player.animator.Play(_animName);
+    }
+
+    protected void OverrideAnimation(string animationName)
+    {
+        this._animName = animationName;
+    }
+
 
 
 

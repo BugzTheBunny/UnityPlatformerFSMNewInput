@@ -17,14 +17,13 @@ public class PlayerPrimaryAttackState : PlayerState
 
     public override void Enter()
     {
+        OverrideAnimation("player_attack_" + comboCounter);
         base.Enter();
-        //player.SetVelocity(0, 0); // Stop on Attack
         if (comboCounter > 2 || Time.time >= lastTimeAttacked + comboWindow)
         {
             comboCounter = 0;
         }
         stateDuration = inertionTime;
-        player.animator.SetInteger("ComboCounter", comboCounter);
         player.SetVelocity(player.attackMovement[comboCounter] * player.facingDirection, rb.velocity.y);
     }
 
@@ -44,6 +43,8 @@ public class PlayerPrimaryAttackState : PlayerState
         base.Exit();
         player.StartCoroutine(BusyFor(.1f));
         comboCounter++;
+        if (comboCounter > 2)
+            comboCounter = 0;
         lastTimeAttacked = Time.time;
     }
 

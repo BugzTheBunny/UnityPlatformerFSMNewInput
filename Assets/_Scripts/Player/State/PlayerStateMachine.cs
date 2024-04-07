@@ -9,7 +9,6 @@ public class PlayerStateMachine
     public PlayerState currentState { get; private set; }
     public Animation currentStateAnimation { get; private set; }
     private Player player;
-    private Animator animator;
 
     #region [--- States ---]
     public PlayerIdleState idleState { get; private set; }
@@ -39,21 +38,20 @@ public class PlayerStateMachine
 
     public void CreateStateMachine()
     {
-        idleState = new PlayerIdleState(player, this, "Idle");
-        moveState = new PlayerMoveState(player, this, "Move");
-        jumpState = new PlayerJumpState(player, this, "Jump");
-        airState = new PlayerAirState(player, this, "Jump");
-        wallSlideState = new PlayerWallSlideState(player, this, "WallSlide");
-        wallJumpState = new PlayerWallJumpState(player, this, "WallJump");
-        dashState = new PlayerDashState(player, this, "Dash");
-        primaryAttackState = new PlayerPrimaryAttackState(player, this, "Attack");
+        idleState = new PlayerIdleState(player, this, "player_idle");
+        moveState = new PlayerMoveState(player, this, "player_move");
+        jumpState = new PlayerJumpState(player, this, "air_state");
+        airState = new PlayerAirState(player, this, "air_state");
+        wallSlideState = new PlayerWallSlideState(player, this, "player_wallslide");
+        wallJumpState = new PlayerWallJumpState(player, this, "air_state");
+        dashState = new PlayerDashState(player, this, "player_dash");
+        primaryAttackState = new PlayerPrimaryAttackState(player, this, "player_attack");
 
     }
 
     private void SetOnInit()
     {
         player = Player.instance;
-        animator = player.GetComponentInChildren<Animator>();
     }
 
 }
