@@ -19,6 +19,7 @@ public class PlayerState
     [Header(" State / Triggers ")]
     protected bool canAttack = true;
     protected bool triggerCalled;
+    protected bool isGrabbingLedge;
     protected bool isBusy = false;
     protected float xInput = 0;
 
@@ -42,9 +43,6 @@ public class PlayerState
         stateDuration -= Time.deltaTime;
         SetX();
         SetY();
-        if (player.canWallSlide)
-            OnWallSlide();
-
     }
 
     public virtual void Exit()
@@ -64,13 +62,7 @@ public class PlayerState
             stateMachine.ChangeState(stateMachine.dashState);
     }
 
-    private void OnWallSlide()
-    {
-        if (player.IsWallDetected() && !player.IsGrounded() && rb.velocity.y <= 0)
-        {
-            stateMachine.ChangeState(stateMachine.wallSlideState);
-        }
-    }
+
 
     private void SetX()
     {
@@ -90,6 +82,16 @@ public class PlayerState
         player.EnableMovement();
         isBusy = false;
     }
+
+    public IEnumerator StopLedgeRaysFor(float _seconds)
+    {
+        player.DisableLedgeRays();
+        yield return new WaitForSeconds(_seconds);
+        player.EnableLedgeRays();
+
+    }
+
+
     #endregion
 
     private void PlayAnimation()
@@ -102,7 +104,12 @@ public class PlayerState
         this._animName = animationName;
     }
 
+    protected void LedgeDetection()
+    {
+        if (player.IsLedgeDetected())
+            stateMachine.ChangeState(stateMachine.ledgeGrabState);
 
+    }
 
 
 }

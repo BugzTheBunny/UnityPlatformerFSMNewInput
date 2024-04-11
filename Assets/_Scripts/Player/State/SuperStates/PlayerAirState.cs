@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerAirState : PlayerState
@@ -17,9 +18,12 @@ public class PlayerAirState : PlayerState
     public override void Update()
     {
         base.Update();
+        OnWallSlide();
+        player.EnableLedgeRays();
+        if (rb.velocity.y < 0)
+            LedgeDetection();
         Move();
-        LedgeDetection();
-        if (rb.velocity.y == 0)
+        if (player.IsGrounded() && rb.velocity.y == 0)
             stateMachine.ChangeState(stateMachine.idleState);
     }
 
@@ -38,6 +42,7 @@ public class PlayerAirState : PlayerState
     private void Unsubscribe()
     {
         PlayerInputManager.attackPerformed -= OnAttack;
+
     }
 
     private void OnAttack()
@@ -51,11 +56,13 @@ public class PlayerAirState : PlayerState
             player.SetVelocity(xInput * player.airMoveSpeed, rb.velocity.y);
     }
 
-    private void LedgeDetection()
+    private void OnWallSlide()
     {
-        if (player.IsLedgeDetected())
-            stateMachine.ChangeState(stateMachine.ledgeGrabState);
-        
+        if (player.IsWallDetected() && !player.IsGrounded() && rb.velocity.y <= 0)
+        {
+            stateMachine.ChangeState(stateMachine.wallSlideState);
+        }
     }
+
 
 }

@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
-using System;
+using System.Collections;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class Player : MonoBehaviour
 {
@@ -49,7 +50,10 @@ public class Player : MonoBehaviour
     private Vector3 topRayDestination;
     private Vector3 bottomRayStartPosition;
     private Vector3 bottomRayDestination;
-    
+
+
+    Rect rect = new Rect(0, 0, 300, 100);
+    Vector3 offset = new Vector3(0f, 0f, 0.5f);
 
     [Header(" Attack Settings ")]
     [Tooltip("The amount in this field should be the same amount as attacks you have, this will make the player move a bit per attack ")]
@@ -139,8 +143,16 @@ public class Player : MonoBehaviour
     public void DisableMovement() => _canMove = false;
     public void EnableDash() => _canDash = true;
     public void DisableDash() => _canDash = false;
-    public void EnableGravity() => this.rb.simulated = true;
-    public void DisableGravity() => this.rb.simulated = false;
+    public void EnableGravity()
+    {
+        rb.gravityScale = 4f;
+    }
+
+    public void DisableGravity()
+    {
+        rb.velocity = Vector2.zero;
+        rb.gravityScale = 0f;
+    }
     public void EnableLedgeRays() => ledgeRaysEnabled = true;
     public void DisableLedgeRays() => ledgeRaysEnabled = false;
 
@@ -214,12 +226,24 @@ public class Player : MonoBehaviour
         Gizmos.DrawLine(transform.position, new Vector3(transform.position.x + wallCastDistance * facingDirection, transform.position.y)); // WallCheck
 
         // Ledge Detection
-        Gizmos.color = topLedgeRayDetected ? Color.green : Color.grey;
-        Gizmos.DrawLine(topRayStartPosition, topRayDestination);
-        Gizmos.color = bottomLedgeRayDetected ? Color.green : Color.grey;
-        Gizmos.DrawLine(bottomRayStartPosition, bottomRayDestination);
+        if (ledgeRaysEnabled)
+        {
+            Gizmos.color = topLedgeRayDetected ? Color.green : Color.grey;
+            Gizmos.DrawLine(topRayStartPosition, topRayDestination);
+            Gizmos.color = bottomLedgeRayDetected ? Color.green : Color.grey;
+            Gizmos.DrawLine(bottomRayStartPosition, bottomRayDestination);
+        }
+
     }
 
 
     #endregion
+
+    void OnGUI()
+    {
+        Vector3 point = Camera.main.WorldToScreenPoint(transform.position + offset);
+        rect.x = point.x;
+        rect.y = Screen.height - point.y - rect.height; // bottom left corner set to the 3D point
+        GUI.Label(rect, stateMachine.currentState.ToString()); // display its name, or other string
+    }
 }

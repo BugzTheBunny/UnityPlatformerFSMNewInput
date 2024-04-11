@@ -25,9 +25,10 @@ public class PlayerWallSlideState : PlayerState
         base.Update();
         Slide();
         IsOnWall();
+        LedgeDetection();
     }
 
-    
+
 
     public override void Exit()
     {
@@ -51,7 +52,7 @@ public class PlayerWallSlideState : PlayerState
 
     private void IsOnWall()
     {
-        if (rb.velocity.y == 0 || !player.IsWallDetected())
+        if (rb.velocity.y == 0 && !isGrabbingLedge || !player.IsWallDetected())
             stateMachine.ChangeState(stateMachine.idleState);
     }
 

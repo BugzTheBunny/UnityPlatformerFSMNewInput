@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerLedgeGrabState : PlayerState
@@ -13,8 +14,10 @@ public class PlayerLedgeGrabState : PlayerState
     public override void Enter()
     {
         base.Enter();
-        Subscribe();
+        player.SetVelocity(0, 0);
         player.DisableGravity();
+        isGrabbingLedge = true;
+        Subscribe();
 
     }
 
@@ -26,25 +29,36 @@ public class PlayerLedgeGrabState : PlayerState
     public override void Exit()
     {
         base.Exit();
+        player.EnableGravity();
+        player.StartCoroutine(StopLedgeRaysFor(.5f));
         Unsubscribe();
+        isGrabbingLedge = false;
+
     }
 
     private void Subscribe()
     {
         PlayerInputManager.jumpPerformed += OnJump;
+        PlayerInputManager.movePerformed += OnMove;
 
     }
 
     private void Unsubscribe()
     {
-        PlayerInputManager.jumpPerformed += OnJump;
+        PlayerInputManager.jumpPerformed -= OnJump;
+        PlayerInputManager.movePerformed -= OnMove;
 
+    }
+
+    public void OnMove()
+    {
+        player.StartCoroutine(StopLedgeRaysFor(.5f));
+        stateMachine.ChangeState(stateMachine.airState);
     }
 
     private void OnJump()
     {
-        player.EnableGravity();
-        player.DisableLedgeRays();
+
         stateMachine.ChangeState(stateMachine.jumpState);
     }
 }
