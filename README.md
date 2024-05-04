@@ -18,9 +18,11 @@ This repo contains an example of a Finite state machine, using the new Input Sys
 6. Wall Slide State
 7. Wall Jump State
 8. Attack State + Attack Combo
+9. Player Air Attack
+10. Player Edge Grab
 
-### `Basic Movement`
-![demo](GifAnims/basic_move.gif)
+### `Clean State Machine Animator`
+![demo](GifAnims/clean_state_machine.gif)
 
 ### `Wall Jump & Slide`
 ![wall](GifAnims/wall_jump_slide.gif)
@@ -28,10 +30,14 @@ This repo contains an example of a Finite state machine, using the new Input Sys
 ### `Dash & Air Dash`
 ![dash](GifAnims/dash.gif)
 
+### `Air Attack`
+![air_atatck](GifAnims/air_attack.gif)
+
+### `Ledge Grab`
+![ledge](GifAnims/ledge_grab.gif)
+
 ### `Attack + Combo Attack (Extendable)`
 ![attack](GifAnims/combo_attack.gif)
 
 ## Todo:
 1. Double Jump
-2. Air Attack State
-3. Edge Climb State
